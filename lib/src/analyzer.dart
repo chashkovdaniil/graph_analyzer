@@ -7,6 +7,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'class_def.dart';
 import 'field_def.dart';
 import 'method_def.dart';
+import 'reporter.dart';
 
 class GraphAnalyzer {
   List<String> _getFilePathsFromDir(List<String> dirsPath) {
@@ -45,7 +46,7 @@ class GraphAnalyzer {
       }
     }
 
-    DIContainer.reporter.report(
+    Reporter.console().report(
       classesDef.map((e) => e.toString()).join('\n'),
       reportFilePath,
     );
@@ -114,31 +115,4 @@ class GraphAnalyzer {
         'Symbol',
         'Symbol?',
       ].contains(type);
-}
-
-abstract class Reporter {
-  void report(String text, String reportFilePath);
-}
-
-class ConsoleReporter extends Reporter {
-  @override
-  void report(String text, String _) {
-    print(text);
-  }
-}
-
-class FileReporter extends Reporter {
-  @override
-  void report(String text, String reportFilePath) {
-    final file = File(reportFilePath);
-    file.createSync();
-    var ioSink = file.openWrite();
-    ioSink.write(text);
-    ioSink.close();
-  }
-}
-
-class DIContainer {
-  static Reporter get reporter => FileReporter();
-  //ConsoleReporter();
 }
