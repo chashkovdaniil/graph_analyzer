@@ -1,0 +1,14 @@
+name: graph_analyzer
+description: This package help you build UML diagram. You have to copy result from result file and paste in PlantUML
+version: 0.0.1
+homepage:
+
+environment:
+  sdk: '>=2.19.6 <4.0.0'
+
+dependencies:
+  analyzer: any
+
+dev_dependencies:
+  test: any
+  lints: ^2.0.0                                      
