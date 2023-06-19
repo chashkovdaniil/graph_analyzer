@@ -5,6 +5,7 @@ class ClassDef {
   final List<FieldDef> fields = [];
   final List<MethodDef> methods = [];
   final List<String> deps = [];
+  final List<String> implementsOf = [];
 
   String name = '';
   String? extendsOf;
@@ -31,6 +32,11 @@ class ClassDef {
     if (deps.isNotEmpty) {
       for (var dep in deps) {
         result += '$name ..> $dep\n';
+      }
+    }
+    if (implementsOf.isNotEmpty) {
+      for (var implementOf in implementsOf) {
+        result += '$name ..|> $implementOf\n';
       }
     }
 

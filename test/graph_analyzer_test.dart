@@ -24,3 +24,10 @@ class C {
 
   C(this.a);
 }
+
+class D {}
+
+class E implements A, D {
+  @override
+  void a() {}
+}

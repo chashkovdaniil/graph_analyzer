@@ -55,9 +55,14 @@ class GraphAnalyzer {
 
   ClassDef _analyzeClass(ClassDeclaration classDeclaration) {
     final extendsOf = classDeclaration.extendsClause?.superclass.name2.lexeme;
+    final implementsOf = classDeclaration.implementsClause?.interfaces
+            .map((e) => e.name2.lexeme)
+            .toList() ??
+        [];
     final classDef = ClassDef();
     classDef.name = classDeclaration.name.lexeme;
     classDef.extendsOf = extendsOf;
+    classDef.implementsOf.addAll(implementsOf);
     for (var member in classDeclaration.members) {
       if (member is MethodDeclaration) {
         classDef.methods.add(_analyzeMethod(member));
