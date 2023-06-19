@@ -1,22 +1,26 @@
 import 'dart:io';
 
 abstract class Reporter {
-  factory Reporter.file() => FileReporter();
+  factory Reporter.file(String reportFilePath) => FileReporter(reportFilePath);
   factory Reporter.console() => ConsoleReporter();
 
-  void report(String text, String reportFilePath);
+  void report(String text);
 }
 
 class ConsoleReporter implements Reporter {
   @override
-  void report(String text, String _) {
+  void report(String text) {
     print(text);
   }
 }
 
 class FileReporter implements Reporter {
+  final String reportFilePath;
+
+  const FileReporter(this.reportFilePath);
+
   @override
-  void report(String text, String reportFilePath) {
+  void report(String text) {
     final file = File(reportFilePath);
     file.createSync();
     var ioSink = file.openWrite();

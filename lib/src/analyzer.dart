@@ -10,12 +10,15 @@ import 'method_def.dart';
 import 'reporter.dart';
 
 class GraphAnalyzer {
+  const GraphAnalyzer();
+
   List<String> _getFilePathsFromDir(List<String> dirsPath) {
     final files = <String>[];
     for (var dirPath in dirsPath) {
       var dir = Directory(dirPath);
       dir.listSync(recursive: true).forEach((fileEntity) {
-        if (fileEntity.statSync().type != FileSystemEntityType.file) {
+        if (fileEntity.statSync().type != FileSystemEntityType.file ||
+            !fileEntity.path.endsWith('.dart')) {
           return;
         }
         files.add(fileEntity.path);
@@ -29,8 +32,8 @@ class GraphAnalyzer {
       throw Exception('Не указан путь сохранения файла');
     }
     final reportFilePath = dirsPath.last;
-    var includedPaths =
-        _getFilePathsFromDir(dirsPath.sublist(0, dirsPath.length - 1)).toList();
+    final filesPaths = dirsPath.sublist(0, dirsPath.length - 1);
+    var includedPaths = _getFilePathsFromDir(filesPaths).toList();
     var classesDef = <ClassDef>[];
     var collection = AnalysisContextCollection(includedPaths: includedPaths);
 
@@ -40,16 +43,14 @@ class GraphAnalyzer {
       if (unit is ParsedUnitResult) {
         for (var unitMember in unit.unit.declarations) {
           if (unitMember is ClassDeclaration) {
-            classesDef.add(_analyzeClass(unitMember));
+            final analyzedClass = _analyzeClass(unitMember);
+            classesDef.add(analyzedClass);
           }
         }
       }
     }
 
-    Reporter.console().report(
-      classesDef.map((e) => e.toString()).join('\n'),
-      reportFilePath,
-    );
+    Reporter.console().report(classesDef.map((e) => e.toString()).join('\n'));
   }
 
   ClassDef _analyzeClass(ClassDeclaration classDeclaration) {

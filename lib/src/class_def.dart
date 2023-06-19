@@ -11,21 +11,20 @@ class ClassDef {
 
   @override
   String toString() {
-    var result = '''class $name {\n''';
+    var result = 'class $name {\n';
 
     for (var field in fields) {
       result += '${field.name}: ${field.type}\n';
     }
 
-    result += '''\n---\n''';
+    result += '\n---\n';
 
     for (var method in methods) {
       result += '${method.name}(): ${method.returnType}\n';
     }
 
-    result += '''
-      }
-    ''';
+    result += '\n}\n';
+
     if (extendsOf != null) {
       result += '$extendsOf <|-- $name\n';
     }
