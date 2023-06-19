@@ -9,13 +9,16 @@ import 'field_def.dart';
 import 'method_def.dart';
 import 'reporter.dart';
 
+// TODO: добавить указание репортера
 class GraphAnalyzer {
   const GraphAnalyzer();
 
+  /// Получает файлы из указанных дирректорий
   List<String> _getFilePathsFromDir(List<String> dirsPath) {
     final files = <String>[];
-    for (var dirPath in dirsPath) {
-      var dir = Directory(dirPath);
+    for (final dirPath in dirsPath) {
+      final dir = Directory(dirPath);
+
       dir.listSync(recursive: true).forEach((fileEntity) {
         if (fileEntity.statSync().type != FileSystemEntityType.file ||
             !fileEntity.path.endsWith('.dart')) {
@@ -28,20 +31,21 @@ class GraphAnalyzer {
   }
 
   void call(List<String> dirsPath) {
+    // TODO: обработать кейс, когда меньше одного пути
     if (dirsPath.length == 1) {
       throw Exception('Не указан путь сохранения файла');
     }
     final reportFilePath = dirsPath.last;
     final filesPaths = dirsPath.sublist(0, dirsPath.length - 1);
-    var includedPaths = _getFilePathsFromDir(filesPaths).toList();
-    var classesDef = <ClassDef>[];
-    var collection = AnalysisContextCollection(includedPaths: includedPaths);
+    final includedPaths = _getFilePathsFromDir(filesPaths).toList();
+    final classesDef = <ClassDef>[];
+    final collection = AnalysisContextCollection(includedPaths: includedPaths);
 
-    for (var path in includedPaths) {
-      var unit = collection.contexts.first.currentSession.getParsedUnit(path);
+    for (final path in includedPaths) {
+      final unit = collection.contexts.first.currentSession.getParsedUnit(path);
 
       if (unit is ParsedUnitResult) {
-        for (var unitMember in unit.unit.declarations) {
+        for (final unitMember in unit.unit.declarations) {
           if (unitMember is ClassDeclaration) {
             final analyzedClass = _analyzeClass(unitMember);
             classesDef.add(analyzedClass);
@@ -50,9 +54,11 @@ class GraphAnalyzer {
       }
     }
 
-    Reporter.console().report(classesDef.map((e) => e.toString()).join('\n'));
+    Reporter.file(reportFilePath)
+        .report(classesDef.map((e) => e.toString()).join('\n'));
   }
 
+  /// Анализирует класс на методы, поля, наследование, реализации, а также зависимости
   ClassDef _analyzeClass(ClassDeclaration classDeclaration) {
     final extendsOf = classDeclaration.extendsClause?.superclass.name2.lexeme;
     final implementsOf = classDeclaration.implementsClause?.interfaces
@@ -62,8 +68,9 @@ class GraphAnalyzer {
     final classDef = ClassDef();
     classDef.name = classDeclaration.name.lexeme;
     classDef.extendsOf = extendsOf;
+    classDef.isAbstract = classDeclaration.abstractKeyword != null;
     classDef.implementsOf.addAll(implementsOf);
-    for (var member in classDeclaration.members) {
+    for (final member in classDeclaration.members) {
       if (member is MethodDeclaration) {
         classDef.methods.add(_analyzeMethod(member));
       } else if (member is FieldDeclaration) {
@@ -74,23 +81,34 @@ class GraphAnalyzer {
     return classDef;
   }
 
+  /// Анализирует метод
   MethodDef _analyzeMethod(MethodDeclaration methodDeclaration) {
-    var methodDef = MethodDef();
+    final methodDef = MethodDef();
     methodDef.returnType = methodDeclaration.returnType?.toString() ?? 'void';
     methodDef.name = methodDeclaration.name.lexeme;
     return methodDef;
   }
 
+  /// Анализирует поле класса
   FieldDef _analyzeField(FieldDeclaration fieldDeclaration) {
-    var fieldDef = FieldDef();
+    final fieldDef = FieldDef();
     fieldDef.type = fieldDeclaration.fields.type.toString();
-    fieldDef.name = fieldDeclaration.fields.variables.first.toString();
+    fieldDef.name = fieldDeclaration.fields.variables.first.name.lexeme;
     return fieldDef;
   }
 
-  List<String> _analyzeDeps(FieldDeclaration fieldDeclaration) {
-    final result = <String>[];
-    final type = fieldDeclaration.fields.type.toString();
+  /// Анализирует зависимости
+  Set<String> _analyzeDeps(FieldDeclaration fieldDeclaration) {
+    final result = <String>{};
+    var type = fieldDeclaration.fields.type.toString();
+
+    if (type.endsWith('?')) {
+      type = type.replaceAll('?', '');
+    }
+
+    if (type.contains('<')) {
+      type = type.replaceAll(RegExp(r'<.*>'), '');
+    }
 
     if (_isDep(type)) {
       result.add(type);
@@ -99,6 +117,7 @@ class GraphAnalyzer {
     return result;
   }
 
+  /// Определяет является ли данными тип зависимостью. Он являеются зависимостью, если это не базовый тип
   bool _isDep(String type) =>
       !type.startsWith('List') &&
       !type.startsWith('Map') &&
@@ -120,5 +139,6 @@ class GraphAnalyzer {
         'null',
         'Symbol',
         'Symbol?',
-      ].contains(type);
+      ].contains(type) &&
+      !type.contains(' ');
 }

@@ -1,30 +1,44 @@
 import 'field_def.dart';
 import 'method_def.dart';
 
+/// Этот сущность описывает класс.
+///
+/// [fields] - поля класса
+///
+/// [methods] - методы класса
+///
+/// [deps] - зависимости класса
+///
+/// [implementsOf] - Интерфейсы, которые реализует данный класс
+///
+/// [extendsOf] - класс, от которого наследуется текущий
 class ClassDef {
   final List<FieldDef> fields = [];
   final List<MethodDef> methods = [];
-  final List<String> deps = [];
-  final List<String> implementsOf = [];
+  final Set<String> deps = {};
+  final Set<String> implementsOf = {};
 
   String name = '';
   String? extendsOf;
+  bool isAbstract = false;
 
   @override
   String toString() {
-    var result = 'class $name {\n';
+    var result = isAbstract ? 'abstract ' : '';
+
+    result += 'class $name {\n';
 
     for (var field in fields) {
       result += '${field.name}: ${field.type}\n';
     }
 
-    result += '\n---\n';
+    result += '---\n';
 
     for (var method in methods) {
       result += '${method.name}(): ${method.returnType}\n';
     }
 
-    result += '\n}\n';
+    result += '}\n';
 
     if (extendsOf != null) {
       result += '$extendsOf <|-- $name\n';

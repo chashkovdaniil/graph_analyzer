@@ -1,22 +1,27 @@
 class A {
-
 ---
 a(): void
-
 }
 
 class B {
-
 ---
 b(): String
-
 }
 A <|-- B
 
 class C {
 a: A
-
 ---
-
 }
 C ..> A
+
+class D {
+---
+}
+
+class E {
+---
+a(): void
+}
+E ..|> A
+E ..|> D
