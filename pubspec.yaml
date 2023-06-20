@@ -1,7 +1,8 @@
 name: code_uml
 description: This package help you build UML diagram. You have to copy result from result file and paste in PlantUML
 version: 0.0.1
-homepage:
+homepage: https://github.com/chashkovdaniil/graph_analyzer/
+repository: https://github.com/chashkovdaniil/graph_analyzer/
 
 environment:
   sdk: '>=2.17.0 <4.0.0'

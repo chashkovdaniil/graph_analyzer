@@ -1,19 +1,19 @@
 import 'field_def.dart';
 import 'method_def.dart';
 
-/// Этот сущность описывает класс.
+/// This entity describes the class.
 ///
-/// [fields] - поля класса
+/// [fields] - class fields
 ///
-/// [methods] - методы класса
+/// [methods] - class methods
 ///
-/// [deps] - зависимости класса
+/// [deps] - class dependencies
 ///
-/// [implementsOf] - Интерфейсы, которые реализует данный класс
+/// [implementsOf] - Interfaces that this class implements
 ///
-/// [extendsOf] - класс, от которого наследуется текущий
+/// [extendsOf] - the class from which the current one is inherited
 ///
-/// [isAbstract] - является ли класс абстрактным
+/// [isAbstract] - whether the class is abstract
 class ClassDef {
   final List<FieldDef> fields = [];
   final List<MethodDef> methods = [];

@@ -9,13 +9,15 @@ import 'field_def.dart';
 import 'method_def.dart';
 import 'reporter.dart';
 
-// TODO: добавить указание репортера
+/// Analyzes the code and turns it into uml code
+///
+/// [reporter] - the entity that outputs the result
 class CodeUml {
   final Reporter reporter;
 
   CodeUml({required this.reporter});
 
-  /// Получает файлы из указанных дирректорий
+  /// Retrieves files from the specified directories
   List<String> _getFilePathsFromDir(List<String> dirsPath) {
     final files = <String>[];
     for (final dirPath in dirsPath) {
@@ -56,7 +58,7 @@ class CodeUml {
     reporter.report(classesDef);
   }
 
-  /// Анализирует класс на методы, поля, наследование, реализации, а также зависимости
+  /// Analyzes a class for methods, fields, inheritance, implementations, and dependencies
   ClassDef _analyzeClass(ClassDeclaration classDeclaration) {
     final extendsOf = classDeclaration.extendsClause?.superclass.name2.lexeme;
     final implementsOf = classDeclaration.implementsClause?.interfaces
@@ -79,7 +81,7 @@ class CodeUml {
     return classDef;
   }
 
-  /// Анализирует метод
+  /// Analyzes a method
   MethodDef _analyzeMethod(MethodDeclaration methodDeclaration) {
     final methodDef = MethodDef();
     methodDef.returnType = methodDeclaration.returnType?.toString() ?? 'void';
@@ -88,7 +90,7 @@ class CodeUml {
     return methodDef;
   }
 
-  /// Анализирует поле класса
+  /// Analyzes a class field
   FieldDef _analyzeField(FieldDeclaration fieldDeclaration) {
     final fieldDef = FieldDef();
     fieldDef.type = fieldDeclaration.fields.type.toString();
@@ -97,7 +99,7 @@ class CodeUml {
     return fieldDef;
   }
 
-  /// Анализирует зависимости
+  /// Analyzes dependencies
   Set<String> _analyzeDeps(FieldDeclaration fieldDeclaration) {
     final result = <String>{};
     var type = fieldDeclaration.fields.type.toString();
@@ -117,7 +119,7 @@ class CodeUml {
     return result;
   }
 
-  /// Определяет является ли данными тип зависимостью. Он являеются зависимостью, если это не базовый тип
+  /// Determines whether the data type is a dependency. It is a dependency if it is not a base type
   bool _isDep(String type) =>
       !type.startsWith('List') &&
       !type.startsWith('Map') &&

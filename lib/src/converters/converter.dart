@@ -1,5 +1,6 @@
 import '../class_def.dart';
 
 abstract class Converter {
-  String convertToText(List<ClassDef> des);
+  /// Converts [ClassDef] to uml code
+  String convertToText(List<ClassDef> defs);
 }
