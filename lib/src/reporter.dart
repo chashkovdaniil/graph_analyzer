@@ -1,30 +1,47 @@
 import 'dart:io';
 
-abstract class Reporter {
-  factory Reporter.file(String reportFilePath) => FileReporter(reportFilePath);
-  factory Reporter.console() => ConsoleReporter();
+import 'class_def.dart';
+import 'converters/converter.dart';
 
-  void report(String text);
+abstract class Reporter {
+  late Converter converter;
+
+  factory Reporter.file(
+    String reportFilePath,
+    Converter converter,
+  ) =>
+      _FileReporter(reportFilePath, converter);
+
+  factory Reporter.console(
+    Converter converter,
+  ) =>
+      _ConsoleReporter(converter);
+
+  void report(List<ClassDef> text);
 }
 
-class ConsoleReporter implements Reporter {
+class _ConsoleReporter implements Reporter {
+  Converter converter;
+  _ConsoleReporter(this.converter);
+
   @override
-  void report(String text) {
-    print(text);
+  void report(List<ClassDef> defs) {
+    print(converter.convertToText(defs));
   }
 }
 
-class FileReporter implements Reporter {
+class _FileReporter implements Reporter {
   final String reportFilePath;
+  Converter converter;
 
-  const FileReporter(this.reportFilePath);
+  _FileReporter(this.reportFilePath, this.converter);
 
   @override
-  void report(String text) {
+  void report(List<ClassDef> defs) {
     final file = File(reportFilePath);
     file.createSync();
     var ioSink = file.openWrite();
-    ioSink.write(text);
+    ioSink.write(converter.convertToText(defs));
     ioSink.close();
   }
 }

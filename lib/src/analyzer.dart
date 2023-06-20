@@ -3,15 +3,19 @@ import 'dart:io';
 import 'package:analyzer/dart/analysis/analysis_context_collection.dart';
 import 'package:analyzer/dart/analysis/results.dart';
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:graph_analyzer/src/converters/converter.dart';
 
 import 'class_def.dart';
+import 'converters/plant_uml_converter.dart';
 import 'field_def.dart';
 import 'method_def.dart';
 import 'reporter.dart';
 
 // TODO: добавить указание репортера
 class GraphAnalyzer {
-  const GraphAnalyzer();
+  final Reporter reporter;
+
+  GraphAnalyzer({required this.reporter});
 
   /// Получает файлы из указанных дирректорий
   List<String> _getFilePathsFromDir(List<String> dirsPath) {
@@ -31,13 +35,10 @@ class GraphAnalyzer {
   }
 
   void call(List<String> dirsPath) {
-    // TODO: обработать кейс, когда меньше одного пути
-    if (dirsPath.length == 1) {
-      throw Exception('Не указан путь сохранения файла');
+    if (dirsPath.length < 1) {
+      throw Exception('Directories are not specified');
     }
-    final reportFilePath = dirsPath.last;
-    final filesPaths = dirsPath.sublist(0, dirsPath.length - 1);
-    final includedPaths = _getFilePathsFromDir(filesPaths).toList();
+    final includedPaths = _getFilePathsFromDir(dirsPath).toList();
     final classesDef = <ClassDef>[];
     final collection = AnalysisContextCollection(includedPaths: includedPaths);
 
@@ -54,8 +55,7 @@ class GraphAnalyzer {
       }
     }
 
-    Reporter.file(reportFilePath)
-        .report(classesDef.map((e) => e.toString()).join('\n'));
+    reporter.report(classesDef);
   }
 
   /// Анализирует класс на методы, поля, наследование, реализации, а также зависимости
@@ -86,6 +86,7 @@ class GraphAnalyzer {
     final methodDef = MethodDef();
     methodDef.returnType = methodDeclaration.returnType?.toString() ?? 'void';
     methodDef.name = methodDeclaration.name.lexeme;
+    methodDef.isPrivate = methodDef.name.startsWith('_');
     return methodDef;
   }
 
@@ -94,6 +95,7 @@ class GraphAnalyzer {
     final fieldDef = FieldDef();
     fieldDef.type = fieldDeclaration.fields.type.toString();
     fieldDef.name = fieldDeclaration.fields.variables.first.name.lexeme;
+    fieldDef.isPrivate = fieldDef.name.startsWith('_');
     return fieldDef;
   }
 

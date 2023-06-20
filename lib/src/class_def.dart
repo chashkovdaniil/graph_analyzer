@@ -12,6 +12,8 @@ import 'method_def.dart';
 /// [implementsOf] - Интерфейсы, которые реализует данный класс
 ///
 /// [extendsOf] - класс, от которого наследуется текущий
+///
+/// [isAbstract] - является ли класс абстрактным
 class ClassDef {
   final List<FieldDef> fields = [];
   final List<MethodDef> methods = [];
@@ -21,39 +23,4 @@ class ClassDef {
   String name = '';
   String? extendsOf;
   bool isAbstract = false;
-
-  @override
-  String toString() {
-    var result = isAbstract ? 'abstract ' : '';
-
-    result += 'class $name {\n';
-
-    for (var field in fields) {
-      result += '${field.name}: ${field.type}\n';
-    }
-
-    result += '---\n';
-
-    for (var method in methods) {
-      result += '${method.name}(): ${method.returnType}\n';
-    }
-
-    result += '}\n';
-
-    if (extendsOf != null) {
-      result += '$extendsOf <|-- $name\n';
-    }
-    if (deps.isNotEmpty) {
-      for (var dep in deps) {
-        result += '$name ..> $dep\n';
-      }
-    }
-    if (implementsOf.isNotEmpty) {
-      for (var implementOf in implementsOf) {
-        result += '$name ..|> $implementOf\n';
-      }
-    }
-
-    return result;
-  }
 }
