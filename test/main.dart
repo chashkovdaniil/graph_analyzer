@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:graph_analyzer/graph_analyzer.dart';
-import 'package:graph_analyzer/src/reporter.dart';
+import 'package:code_uml/code_uml.dart';
+import 'package:code_uml/src/reporter.dart';
 import 'package:path/path.dart' as path;
 import 'package:test/test.dart';
 
@@ -50,7 +50,7 @@ void main() {
         final converter = PlantUmlConverter();
         final reporter = Reporter.console(converter);
 
-        final analyzer = GraphAnalyzer(reporter: reporter);
+        final analyzer = CodeUml(reporter: reporter);
         analyzer(dirPaths);
       },
       zoneSpecification: zoneSpecification,

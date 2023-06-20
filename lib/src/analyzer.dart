@@ -3,19 +3,17 @@ import 'dart:io';
 import 'package:analyzer/dart/analysis/analysis_context_collection.dart';
 import 'package:analyzer/dart/analysis/results.dart';
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:graph_analyzer/src/converters/converter.dart';
 
 import 'class_def.dart';
-import 'converters/plant_uml_converter.dart';
 import 'field_def.dart';
 import 'method_def.dart';
 import 'reporter.dart';
 
 // TODO: добавить указание репортера
-class GraphAnalyzer {
+class CodeUml {
   final Reporter reporter;
 
-  GraphAnalyzer({required this.reporter});
+  CodeUml({required this.reporter});
 
   /// Получает файлы из указанных дирректорий
   List<String> _getFilePathsFromDir(List<String> dirsPath) {

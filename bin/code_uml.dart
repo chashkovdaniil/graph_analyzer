@@ -1,5 +1,5 @@
-import 'package:graph_analyzer/graph_analyzer.dart';
-import 'package:graph_analyzer/src/reporter.dart';
+import 'package:code_uml/code_uml.dart';
+import 'package:code_uml/src/reporter.dart';
 
 void main(List<String> args) {
   final Converter converter = PlantUmlConverter();
@@ -20,6 +20,6 @@ void main(List<String> args) {
     reporter = Reporter.file(reportFilePath, converter);
   }
 
-  final analyzer = GraphAnalyzer(reporter: reporter);
+  final analyzer = CodeUml(reporter: reporter);
   analyzer(dirPaths);
 }
