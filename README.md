@@ -43,3 +43,6 @@ To convert the result to an svg file, [download this library](https://github.com
 ```bash
 java -jar <path_to_jar_file> <path_your_file_with_uml_code> -svg
 ```
+
+#### SVG Result
+![Result]([https://myoctocat.com/assets/images/base-octocat.svg](https://github.com/chashkovdaniil/graph_analyzer/blob/main/example/example_of_provider.svg)https://github.com/chashkovdaniil/graph_analyzer/blob/main/example/example_of_provider.svg))
