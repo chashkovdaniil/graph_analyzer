@@ -8,7 +8,7 @@ environment:
   sdk: '>=2.17.0 <4.0.0'
 
 executables: 
-  code_uml:
+  code_uml: main
 
 dependencies:
   analyzer: ^5.13.0
