@@ -42,13 +42,20 @@ This library supports PlantUML for drawing diagrams so far.
 To convert the result to an svg file, [download this library](https://github.com/plantuml/plantuml/releases), then run the command:
 
 #### Linux
-```bash
-java -jar <path_to_jar_file> <path_your_file_with_uml_code> -svg
-```
 
 #### Mac Os
 
+```bash
+brew install graphviz
+```
+
 #### Windows
+
+#### Then
+
+```bash
+java -jar <path_to_jar_file> <path_your_file_with_uml_code> -svg
+```
 
 #### Example SVG
 ![UML diagram of Provider.](https://github.com/chashkovdaniil/graph_analyzer/raw/main/example/example_of_provider.svg)
