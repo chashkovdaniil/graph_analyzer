@@ -40,9 +40,15 @@ code_uml /home/user/my_dir_code/first_dir  /home/user/documents/uml.txt
 This library supports PlantUML for drawing diagrams so far. 
 
 To convert the result to an svg file, [download this library](https://github.com/plantuml/plantuml/releases), then run the command:
+
+#### Linux
 ```bash
 java -jar <path_to_jar_file> <path_your_file_with_uml_code> -svg
 ```
+
+#### Mac Os
+
+#### Windows
 
 #### Example SVG
 ![UML diagram of Provider.](https://github.com/chashkovdaniil/graph_analyzer/raw/main/example/example_of_provider.svg)
