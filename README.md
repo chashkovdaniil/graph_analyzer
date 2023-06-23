@@ -41,7 +41,11 @@ This library supports PlantUML for drawing diagrams so far.
 
 To convert the result to an svg file, [download this library](https://github.com/plantuml/plantuml/releases), then run the command:
 
+#### Using
+You need additional programms:
+
 #### Linux
+Open JDK 17
 
 #### Mac Os
 
@@ -50,6 +54,7 @@ brew install graphviz
 ```
 
 #### Windows
+TODO: fill this
 
 #### Then
 
