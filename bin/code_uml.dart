@@ -4,10 +4,16 @@ import 'dart:io';
 import 'package:code_uml/code_uml.dart';
 import 'package:code_uml/src/reporter.dart';
 import 'package:code_uml/utils.dart';
+import 'package:jni/jni.dart';
+import 'package:path/path.dart';
 
 void main(List<String> arguments) async {
   const helper = _Helper();
   runZonedGuarded(() {
+    Jni.spawn(
+      dylibDir: join('build', 'jni_libs'),
+      classPath: ['java', 'java/dev/plantuml'],
+    );
     final args = arguments.toList();
     if (args.contains('--verbose')) {
       Logger().activateVerbose();

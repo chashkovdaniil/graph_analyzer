@@ -57,9 +57,10 @@ class _FileReporter implements Reporter {
     Logger().info('Creating output file...', onlyVerbose: true);
     file = await file.create(recursive: true);
     var ioSink = file.openWrite();
-    ioSink.write(converter.convertToText(defs));
+    final text = converter.convertToText(defs);
+    ioSink.write(text);
     await ioSink.close();
     Logger().success('Created output file: $outputTxtFilePath');
-    diagramCreator?.createFromFile(outputTxtFilePath);
+    diagramCreator?.createFromText(text, outputTxtFilePath);
   }
 }

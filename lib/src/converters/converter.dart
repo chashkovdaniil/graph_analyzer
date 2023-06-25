@@ -1,7 +1,7 @@
 import '../class_def.dart';
 
 abstract class DiagramCreator {
-  Future<bool> createFromFile(String resultFilePath);
+  Future<bool> createFromText(String text, String resultFilePath);
 }
 
 abstract class Converter {
