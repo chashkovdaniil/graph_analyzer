@@ -16,8 +16,8 @@
 
 import "dart:isolate" show ReceivePort;
 import "dart:ffi" as ffi;
-import "package:jni/internal_helpers_for_jnigen.dart";
-import "package:jni/jni.dart" as jni;
+import "package:code_uml/jni/internal_helpers_for_jnigen.dart";
+import "package:code_uml/jni/jni.dart" as jni;
 
 // Auto-generated initialization code.
 

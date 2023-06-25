@@ -12,13 +12,14 @@ executables:
 
 dependencies:
   analyzer: ^5.6.0
+  ffi: ^2.0.2
   io: ^1.0.4
-  jni: ^0.5.0
+#  jni: ^0.5.0
   path: ^1.8.3
 
 dev_dependencies:
   lints: ^2.0.0   
-  jnigen: ^0.5.0
+#  jnigen: ^0.5.0
 
 topics:
   - analysis                                

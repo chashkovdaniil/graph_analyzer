@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:code_uml/code_uml.dart';
 import 'package:code_uml/src/reporter.dart';
 import 'package:code_uml/utils.dart';
-import 'package:jni/jni.dart';
+import 'package:code_uml/jni/jni.dart';
 import 'package:path/path.dart';
 
 void main(List<String> arguments) async {
