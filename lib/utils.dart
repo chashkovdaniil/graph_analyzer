@@ -1,6 +1,6 @@
 class Logger {
   Logger._();
-  static Logger _instance = Logger._();
+  static final Logger _instance = Logger._();
   factory Logger() => _instance;
 
   static bool _verboseMode = false;
