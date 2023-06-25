@@ -11,11 +11,10 @@ executables:
   code_uml:
 
 dependencies:
-  analyzer: ^5.13.0
+  analyzer: ^5.6.0
   path: ^1.8.3
 
 dev_dependencies:
-  test: ^1.24.3
   lints: ^2.0.0   
 
 topics:

@@ -68,9 +68,9 @@ class CodeUml {
 
   /// Analyzes a class for methods, fields, inheritance, implementations, and dependencies
   ClassDef _analyzeClass(ClassDeclaration classDeclaration) {
-    final extendsOf = classDeclaration.extendsClause?.superclass.name2.lexeme;
+    final extendsOf = classDeclaration.extendsClause?.superclass.name.name;
     final implementsOf = classDeclaration.implementsClause?.interfaces
-            .map((e) => e.name2.lexeme)
+            .map((e) => e.name.name)
             .toList() ??
         [];
     final classDef = ClassDef();
