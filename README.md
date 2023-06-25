@@ -6,6 +6,9 @@ This package will help you create code for PlantUML, and then use it to build a 
 The first step is to perform the installation:
 
 ### Common step
+Install Open JDK 17.
+
+Then:
 ```bash
 dart pub global activate code_uml
 ```
@@ -18,8 +21,11 @@ code_uml <dirs_for_analysis> <dir_where_outputs_files_will_be_saved>
 ```
 
 ### Linux
+You must have java on your computer
 
-NOT IMPLEMENTED
+```bash
+code_uml <dirs_for_analysis> <dir_where_outputs_files_will_be_saved>
+```
 
 ### Windows
 

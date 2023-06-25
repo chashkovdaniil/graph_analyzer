@@ -15,9 +15,9 @@ class ComponentsInstaller {
     Logger().info('- $componentName', onlyVerbose: true);
     final isInstalled = await _isInstalledComponent(componentName);
     if (isInstalled) {
-      Logger().success('- $componentName was installed', onlyVerbose: true);
+      Logger().success('- $componentName installed', onlyVerbose: true);
     } else {
-      Logger().error('- $componentName was no installed');
+      Logger().error('- $componentName no installed');
       Logger().regular('Do you want install $componentName? [y/n]');
       final answer = stdin.readLineSync();
       if (answer?.toLowerCase() == 'y') {
@@ -33,10 +33,11 @@ class ComponentsInstaller {
 
   Future<bool> _install(String componentName) async {
     Logger().regular('Installing...');
-    if (Platform.isMacOS) {
+    if (Platform.isMacOS || Platform.isLinux) {
+      final brewPath = await _getBrewPath();
       final processResult = await Process.run(
         "bash",
-        ["-c", "/opt/homebrew/bin/brew install $componentName"],
+        ["-c", "$brewPath install $componentName"],
       );
       return processResult.exitCode == 0;
     }
@@ -44,10 +45,11 @@ class ComponentsInstaller {
   }
 
   Future<bool> _isInstalledComponent(String componentName) async {
-    if (Platform.isMacOS) {
+    if (Platform.isMacOS || Platform.isLinux) {
+      final brewPath = await _getBrewPath();
       final processResult = await Process.run(
         "bash",
-        ["-c", "/opt/homebrew/bin/brew list | grep $componentName"],
+        ["-c", "$brewPath list | grep $componentName"],
       );
       return (processResult.stdout as String).isNotEmpty;
     }
@@ -56,18 +58,32 @@ class ComponentsInstaller {
 
   Future<void> _checkPackageManager() async {
     Logger().info('Package manager:', onlyVerbose: true);
-    if (Platform.isMacOS) {
+    if (Platform.isMacOS || Platform.isLinux) {
       await _checkHomebrew();
     }
   }
 
   Future<bool> _checkHomebrew() async {
-    final isInstalled = await Directory('/opt/homebrew/').exists();
+    final pathToBrew = await _getBrewPath();
+    final isInstalled = pathToBrew != null;
     if (!isInstalled) {
       throw Exception('You don\'t have brew. Install url: https://brew.sh/');
     } else {
       Logger().success('- Homebrew installed', onlyVerbose: true);
     }
     return isInstalled;
+  }
+
+  Future<String?> _getBrewPath() async {
+    final paths = [
+      '/opt/homebrew/bin/brew',
+      if (Platform.isLinux) '/home/linuxbrew/.linuxbrew/bin/brew',
+    ];
+    for (final path in paths) {
+      if (await File(path).exists()) {
+        return path;
+      }
+    }
+    return null;
   }
 }
