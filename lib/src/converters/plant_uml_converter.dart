@@ -1,5 +1,42 @@
+import 'dart:io';
+
+import 'package:path/path.dart' as path;
+
+import '../../utils.dart';
 import '../class_def.dart';
 import 'converter.dart';
+
+class PlantUmlDiagramCreator implements DiagramCreator {
+  @override
+  Future<bool> createFromFile(String resultFilePath) async {
+    final outputDiagramFile = resultFilePath.replaceAll(
+      RegExp(r'\..*$'),
+      '.svg',
+    );
+    Logger().info(
+      'Creating diagram to $outputDiagramFile...',
+      onlyVerbose: true,
+    );
+    final processResult = await Process.run(
+      "bash",
+      ["-c", "java -jar /$binPath/plantuml.jar $resultFilePath -svg"],
+    );
+    print(processResult.stdout);
+    if ((processResult.stderr as String).isNotEmpty) {
+      throw Exception(processResult.stderr);
+    }
+    if ((processResult.stdout as String).isEmpty) {
+      Logger().success(
+        'Created diagram: $outputDiagramFile',
+      );
+    }
+    return processResult.exitCode == 0;
+  }
+
+  String get binPath => Platform.script.pathSegments
+      .sublist(0, Platform.script.pathSegments.length - 1)
+      .join(path.separator);
+}
 
 class PlantUmlConverter implements Converter {
   static const _startText = '@startuml';

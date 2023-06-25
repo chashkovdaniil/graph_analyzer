@@ -4,7 +4,9 @@ import 'package:analyzer/dart/analysis/analysis_context_collection.dart';
 import 'package:analyzer/dart/analysis/results.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 
+import '../utils.dart';
 import 'class_def.dart';
+import 'components_installer.dart';
 import 'field_def.dart';
 import 'method_def.dart';
 import 'reporter.dart';
@@ -14,8 +16,10 @@ import 'reporter.dart';
 /// [reporter] - the entity that outputs the result
 class CodeUml {
   final Reporter reporter;
+  final Logger? logger;
+  final ComponentsInstaller _componentsInstaller = ComponentsInstaller();
 
-  CodeUml({required this.reporter});
+  CodeUml({required this.reporter, this.logger});
 
   /// Retrieves files from the specified directories
   List<String> _getFilePathsFromDir(List<String> dirsPath) {
@@ -28,14 +32,17 @@ class CodeUml {
             !fileEntity.path.endsWith('.dart')) {
           return;
         }
-        files.add(fileEntity.path);
+        final path = fileEntity.path;
+        files.add(path);
       });
     }
     return files;
   }
 
-  void call(List<String> dirsPath) {
-    if (dirsPath.length < 1) {
+  Future<void> analyze(List<String> dirsPath) async {
+    await _componentsInstaller.checkComponents();
+
+    if (dirsPath.isEmpty) {
       throw Exception('Directories are not specified');
     }
     final includedPaths = _getFilePathsFromDir(dirsPath).toList();
@@ -43,6 +50,7 @@ class CodeUml {
     final collection = AnalysisContextCollection(includedPaths: includedPaths);
 
     for (final path in includedPaths) {
+      Logger().regular(path);
       final unit = collection.contexts.first.currentSession.getParsedUnit(path);
 
       if (unit is ParsedUnitResult) {
@@ -55,7 +63,7 @@ class CodeUml {
       }
     }
 
-    reporter.report(classesDef);
+    await reporter.report(classesDef);
   }
 
   /// Analyzes a class for methods, fields, inheritance, implementations, and dependencies
@@ -78,6 +86,7 @@ class CodeUml {
         classDef.deps.addAll(_analyzeDeps(member));
       }
     }
+    logger?.info('\t ${classDef.name}', onlyVerbose: true);
     return classDef;
   }
 
@@ -141,6 +150,12 @@ class CodeUml {
         'null',
         'Symbol',
         'Symbol?',
+        'Duration',
+        'Duration?',
+        'StreamSubscription',
+        'StreamSubscription?',
+        'Completer',
+        'Completer?',
       ].contains(type) &&
       !type.contains(' ');
 }
