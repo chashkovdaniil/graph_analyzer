@@ -2,6 +2,12 @@
 
 This package will help you create code for PlantUML, and then use it to build a diagram.
 
+## Unrealized features
+- Generics
+- Getters, Setters
+- Enum
+- Global functions, variables
+
 ## How to use
 The first step is to perform the installation:
 
