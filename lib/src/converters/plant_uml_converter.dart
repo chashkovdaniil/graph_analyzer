@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:jni/jni.dart';
+import 'package:code_uml/jni/jni.dart';
 import 'package:path/path.dart' as path;
 
 import '../../code_uml_java.dart';
