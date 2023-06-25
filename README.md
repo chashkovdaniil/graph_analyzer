@@ -16,21 +16,21 @@ Install Open JDK 17.
 
 Then:
 ```bash
-dart pub global activate code_uml
+> dart pub global activate code_uml
 ```
 
 ### MacOS
 You must have java on your computer
 
 ```bash
-code_uml <dirs_for_analysis> <dir_where_outputs_files_will_be_saved>
+> code_uml <dirs_for_analysis> <dir_where_outputs_files_will_be_saved>
 ```
 
 ### Linux
 You must have java on your computer
 
 ```bash
-code_uml <dirs_for_analysis> <dir_where_outputs_files_will_be_saved>
+> code_uml <dirs_for_analysis> <dir_where_outputs_files_will_be_saved>
 ```
 
 ### Windows
@@ -41,27 +41,27 @@ NOT IMPLEMENTED
 
 Then you need to run the command to output the code to the console:
 ```bash
-code_uml [<your_path_to_dir>] --console
+> code_uml [<your_path_to_dir>] --console
 ```
 
 For example:
 ```bash
-code_uml /home/user/my_dir_code/first_dir  --console
+> code_uml /home/user/my_dir_code/first_dir  --console
 ```
 or
 ```bash
-code_uml /home/user/my_dir_code/first_dir_for_analysis /home/user/my_dir_code/second_dir_for_analysis --console
+> code_uml /home/user/my_dir_code/first_dir_for_analysis /home/user/my_dir_code/second_dir_for_analysis --console
 ```
 
 ### File
 If you want to output the result to a file, then run the command:
 ```bash
-code_uml <...your_path_to_dir> <dir_where_outputs_files_will_be_saved>
+> code_uml <...your_path_to_dir> <dir_where_outputs_files_will_be_saved>
 ```
 
 For example:
 ```bash
-code_uml /home/user/my_dir_code/first_dir  /home/user/documents/uml/
+> code_uml /home/user/my_dir_code/first_dir  /home/user/documents/uml/
 ```
 
 #### Example SVG
