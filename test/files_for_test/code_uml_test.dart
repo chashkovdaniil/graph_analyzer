@@ -1,3 +1,5 @@
+// ignore_for_file: unused_element
+
 class A {
   void a() {}
 }
