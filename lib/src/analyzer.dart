@@ -30,6 +30,7 @@ class CodeUml {
             !fileEntity.path.endsWith('.dart')) {
           return;
         }
+
         final path = fileEntity.path;
         files.add(path);
       });
@@ -46,7 +47,7 @@ class CodeUml {
     final collection = AnalysisContextCollection(includedPaths: includedPaths);
 
     for (final path in includedPaths) {
-      Logger().regular(path);
+      logger?.regular(path);
       final unit = collection.contexts.first.currentSession.getParsedUnit(path);
 
       if (unit is ParsedUnitResult) {
@@ -162,7 +163,7 @@ class CodeUml {
         filename.endsWith('._test.dart');
 
     if (result) {
-      Logger().info('Excluded: $filename', onlyVerbose: false);
+      logger?.info('Excluded: $filename', onlyVerbose: false);
     }
     return result;
   }

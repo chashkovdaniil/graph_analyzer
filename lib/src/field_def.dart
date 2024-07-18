@@ -1,5 +1,6 @@
 import 'package:analyzer/dart/ast/ast.dart';
 
+/// This class describe field definition
 class FieldDef {
   /// Field name
   late final String name;

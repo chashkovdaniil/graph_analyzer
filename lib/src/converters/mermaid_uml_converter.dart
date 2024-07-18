@@ -1,6 +1,8 @@
 import '../../code_uml.dart';
 
 class MermaidUmlConverter extends Converter {
+  MermaidUmlConverter();
+
   @override
   String convertToText(final List<ClassDef> defs) {
     final stringBuffer = StringBuffer();
@@ -43,7 +45,7 @@ class MermaidUmlConverter extends Converter {
     final result = StringBuffer();
     for (final field in def.fields) {
       result.write(
-        '${field.isPrivate ? privateAccessModifier : ''}${field.name}: ${field.type}\n',
+        '${field.isPrivate ? privateAccessModifier : publicAccessModifier}${field.name}: ${field.type}\n',
       );
     }
     return result.toString();
@@ -63,8 +65,14 @@ class MermaidUmlConverter extends Converter {
     final result = StringBuffer();
     for (final method in def.methods) {
       result.write(
-        '${method.isPrivate ? privateAccessModifier : ''}${method.name}(): ${method.returnType}\n',
-      );
+          '${method.isPrivate ? privateAccessModifier : publicAccessModifier}'
+          '${method.isGetter || method.isSetter ? '«' : ''}'
+          '${method.isGetter ? 'get' : ''}'
+          '${method.isGetter && method.isSetter ? '/' : ''}'
+          '${method.isSetter ? 'set' : ''}'
+          '${method.isGetter || method.isSetter ? '»' : ''}'
+          '${method.name}(): '
+          '${method.returnType}\n');
     }
     return result.toString();
   }
@@ -91,5 +99,8 @@ class MermaidUmlConverter extends Converter {
   String get methodsDivider => '';
 
   @override
-  String get privateAccessModifier => '-';
+  final privateAccessModifier = '-';
+
+  @override
+  final publicAccessModifier = '+';
 }

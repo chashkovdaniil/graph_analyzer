@@ -1,10 +1,20 @@
 import '../../code_uml.dart';
 
-abstract class DiagramCreator {
-  Future<bool> createFromText(final String text, final String resultFilePath);
-}
-
+/// This class converts definitions to uml code
 abstract class Converter {
+  static Converter create(final String converterType) {
+    switch (converterType) {
+      case 'mermaid':
+        return MermaidUmlConverter();
+      case 'plantuml':
+      default:
+        return PlantUmlConverter();
+    }
+  }
+
+  /// Public access modifier
+  String get publicAccessModifier;
+
   /// Private access modifier
   String get privateAccessModifier;
 
