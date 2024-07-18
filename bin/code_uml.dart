@@ -1,6 +1,5 @@
 import 'package:args/args.dart';
 import 'package:code_uml/code_uml.dart';
-import 'package:code_uml/src/converters/mermaid_uml_converter.dart';
 import 'package:code_uml/src/reporter.dart';
 import 'package:code_uml/utils.dart';
 
@@ -14,8 +13,8 @@ void main(final List<String> arguments) async {
       'uml',
       abbr: 'u',
       help: 'Select uml coder',
-      defaultsTo: 'mermaid',
-      valueHelp: 'mermaid',
+      defaultsTo: 'plantuml',
+      valueHelp: 'plantuml',
       allowed: ['mermaid', 'plantuml'],
     )
     ..addOption('from', abbr: 'f', help: 'Input directory for analyze')
@@ -38,27 +37,9 @@ void main(final List<String> arguments) async {
     return;
   }
 
-  late Converter converter;
-
-  if (argsResults['uml'] == 'mermaid') {
-    converter = MermaidUmlConverter();
-  } else if (argsResults['uml'] == 'plantuml') {
-    converter = PlantUmlConverter();
-  }
-
-  // TODO: add support for console output (argsResults['to'])
-  final outputToConsole = reportTo == '--console';
-  final reporter = outputToConsole
-      ? Reporter.console(converter)
-      : Reporter.file(
-          reportTo,
-          converter,
-          PlantUmlDiagramCreator(),
-        );
-  final analyzer = CodeUml(
-    reporter: reporter,
-    logger: Logger(),
-  );
+  final converter = Converter.create(argsResults['uml'] as String);
+  final reporter = Reporter.create(converter, reportDirPath: reportTo);
+  final analyzer = CodeUml(reporter: reporter, logger: Logger());
 
   analyzer.analyze(from.split(','));
 }

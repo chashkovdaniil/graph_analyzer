@@ -1,27 +1,5 @@
-import 'dart:io';
-
-import 'package:path/path.dart' as path;
-
 import '../class_def.dart';
 import 'converter.dart';
-
-class PlantUmlDiagramCreator implements DiagramCreator {
-  @override
-  Future<bool> createFromText(
-      final String text, final String resultFilePath) async {
-    // Logger().info('PlantUml file path is $outputDiagramFile');
-    //
-    // Logger().success(
-    //   'Created diagram: $outputDiagramFile',
-    //   onlyVerbose: false,
-    // );
-    return true;
-  }
-
-  String get binPath => Platform.script.pathSegments
-      .sublist(0, Platform.script.pathSegments.length - 1)
-      .join(path.separator);
-}
 
 class PlantUmlConverter implements Converter {
   static const _startText = '@startuml';
@@ -34,8 +12,8 @@ class PlantUmlConverter implements Converter {
     for (final def in defs) {
       stringBuffer.write(def.isAbstract ? 'abstract ' : '');
       stringBuffer.write(convertStartClass(def));
-      stringBuffer.write(methodsDivider);
       stringBuffer.write(convertFields(def));
+      stringBuffer.write(methodsDivider);
       stringBuffer.write(convertMethods(def));
       stringBuffer.write(convertEndClass(def));
       stringBuffer.write(convertExtends(def));
@@ -55,8 +33,14 @@ class PlantUmlConverter implements Converter {
     final result = StringBuffer();
     for (final method in def.methods) {
       result.write(
-        '${method.isPrivate ? privateAccessModifier : ''}${method.name}(): ${method.returnType}\n',
-      );
+          '${method.isPrivate ? privateAccessModifier : publicAccessModifier}'
+          '${method.isGetter || method.isSetter ? '«' : ''}'
+          '${method.isGetter ? 'get' : ''}'
+          '${method.isGetter && method.isSetter ? '/' : ''}'
+          '${method.isSetter ? 'set' : ''}'
+          '${method.isGetter || method.isSetter ? '»' : ''}'
+          '${method.name}(): '
+          '${method.returnType}\n');
     }
     return result.toString();
   }
@@ -66,7 +50,7 @@ class PlantUmlConverter implements Converter {
     final result = StringBuffer();
     for (final field in def.fields) {
       result.write(
-        '${field.isPrivate ? privateAccessModifier : ''}${field.name}: ${field.type}\n',
+        '${field.isPrivate ? privateAccessModifier : publicAccessModifier}${field.name}: ${field.type}\n',
       );
     }
     return result.toString();
@@ -108,5 +92,7 @@ class PlantUmlConverter implements Converter {
   }
 
   @override
-  String get privateAccessModifier => '-';
+  final privateAccessModifier = '-';
+  @override
+  final publicAccessModifier = '+';
 }

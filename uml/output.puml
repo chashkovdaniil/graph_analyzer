@@ -1,37 +1,121 @@
 @startuml
-class MockManRepository {
+class Logger {
+-verboseMode: bool
+---
++activateVerbose(): void
++error(): void
++info(): void
++success(): void
++regular(): void
+}
+class CodeUml {
++reporter: Reporter
++logger: Logger?
+---
+-_getFilePathsFromDir(): String[0..*]
++analyze(): void
+-_analyzeClass(): ClassDef
+-_analyzeMethod(): MethodDef
+-_analyzeField(): FieldDef
+-_analyzeDeps(): Set<String
+-_isDep(): bool
+-_isExcludedFile(): bool
+}
+CodeUml ..> Reporter
+CodeUml ..> Logger
+class MethodDef {
++name: String
++returnType: String
++isPrivate: bool
++isSetter: bool
++isGetter: bool
++isOperator: bool
 ---
 }
-Mock <|-- MockManRepository
-MockManRepository ..|> ManRepository
-class Man {
+class FieldDef {
++name: String
++type: String
++isPrivate: bool
+---
++toString(): String
+}
+class MermaidUmlConverter {
++privateAccessModifier: dynamic
++publicAccessModifier: dynamic
+---
++convertToText(): String
++convertDependencies(): String
++convertExtends(): String
++convertFields(): String
++convertImplements(): String
++convertMethods(): String
++convertStartClass(): String
++convertEndClass(): String
++«get»fileExtension(): String
++«get»methodsDivider(): String
+}
+Converter <|-- MermaidUmlConverter
+class ReturnTypeConverter {
+-returnType: String
+---
++«get»inUml(): String
+-_clearString(): String
+}
+class PlantUmlConverter {
+-startText: dynamic
+-finishText: dynamic
++privateAccessModifier: dynamic
++publicAccessModifier: dynamic
+---
++convertToText(): String
++«get»fileExtension(): String
++convertMethods(): String
++convertFields(): String
++convertStartClass(): String
++convertEndClass(): String
++«get»methodsDivider(): String
++convertExtends(): String
++convertDependencies(): String
++convertImplements(): String
+}
+PlantUmlConverter ..|> Converter
+abstract class Converter {
+---
++create(): Converter
++«get»publicAccessModifier(): String
++«get»privateAccessModifier(): String
++«get»fileExtension(): String
++«get»methodsDivider(): String
++convertStartClass(): String
++convertEndClass(): String
++convertFields(): String
++convertMethods(): String
++convertToText(): String
++convertExtends(): String
++convertDependencies(): String
++convertImplements(): String
+}
+class ClassDef {
++fields: FieldDef[0..*]
++methods: MethodDef[0..*]
++deps: Set<String
++implementsOf: Set<String
++name: String
++extendsOf: String?
++isAbstract: bool
 ---
 }
-abstract class ManRepository {
+abstract class Reporter {
 ---
-getMan(): Man
-addMan(): void
-saveMan(): void
-removeMan(): void
-getMen(): Man[0..*]
++create(): Reporter
++report(): void
 }
-class ManInteractor {
+class _FileReporter {
++converter: Converter
++reportDirPath: String
 ---
--repository: ManRepository
--validator: ManValidator
-getMen(): Man[0..*]
-getMan(): Man
-addMan(): void
-saveMan(): void
-removeMan(): void
++report(): void
 }
-ManInteractor ..> ManRepository
-ManInteractor ..> ManValidator
-class ManValidator {
----
-checkId(): void
-checkMan(): void
-checkPageNumber(): void
-checkPageElementsCount(): void
-}
+_FileReporter ..> Converter
+_FileReporter ..|> Reporter
 @enduml

@@ -6,49 +6,30 @@ import '../utils.dart';
 import 'class_def.dart';
 import 'converters/converter.dart';
 
+///
 abstract class Reporter {
-  late Converter converter;
-  DiagramCreator? diagramCreator;
+  static Reporter create(
+    final Converter converter, {
+    required final String reportDirPath,
+  }) {
+    return Reporter.file(reportDirPath, converter);
+  }
 
   factory Reporter.file(
     final String reportDirPath,
     final Converter converter,
-    final DiagramCreator diagramCreator,
   ) =>
-      _FileReporter(reportDirPath, converter, diagramCreator);
-
-  factory Reporter.console(
-    final Converter converter,
-  ) =>
-      _ConsoleReporter(converter);
+      _FileReporter(reportDirPath, converter);
 
   Future<void> report(final List<ClassDef> text);
 }
 
-class _ConsoleReporter implements Reporter {
-  @override
-  DiagramCreator? diagramCreator;
-
-  @override
-  Converter converter;
-
-  _ConsoleReporter(this.converter);
-
-  @override
-  Future<void> report(final List<ClassDef> defs) async {
-    print(converter.convertToText(defs));
-  }
-}
-
 class _FileReporter implements Reporter {
-  @override
-  DiagramCreator? diagramCreator;
+  final Converter converter;
+
+  _FileReporter(this.reportDirPath, this.converter);
 
   final String reportDirPath;
-  @override
-  Converter converter;
-
-  _FileReporter(this.reportDirPath, this.converter, this.diagramCreator);
 
   @override
   Future<void> report(final List<ClassDef> defs) async {
@@ -60,15 +41,16 @@ class _FileReporter implements Reporter {
     file = await file.create(recursive: true);
 
     final ioSink = file.openWrite();
-
     final text = converter.convertToText(defs);
+
+    Logger().info('Writing output file...', onlyVerbose: true);
+
     ioSink.write(text);
     await ioSink.close();
+
     Logger().success(
       'Created output file: $outputTxtFilePath',
       onlyVerbose: false,
     );
-
-    diagramCreator?.createFromText(text, outputTxtFilePath);
   }
 }

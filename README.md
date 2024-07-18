@@ -1,3 +1,5 @@
+![Pub Likes](https://img.shields.io/pub/likes/code_uml) ![Pub Points](https://img.shields.io/pub/points/code_uml) ![Pub Popularity](https://img.shields.io/pub/popularity/code_uml)
+
 # CodeUML
 
 A command line tool to generate class uml diagram from dart code.
@@ -5,8 +7,8 @@ The tool supports PlantUml and mermaid.
 
 ## Unrealized features
 - Generics
-- Getters, Setters
-- Enum
+- Abstract, static methods, fields
+- Enumeration
 - Global functions, variables
 
 ## How to use

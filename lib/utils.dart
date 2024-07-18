@@ -1,7 +1,7 @@
 class Logger {
-  Logger._();
-  static final Logger _instance = Logger._();
-  factory Logger() => _instance;
+  const Logger._();
+
+  factory Logger() => const Logger._();
 
   static bool _verboseMode = false;
 

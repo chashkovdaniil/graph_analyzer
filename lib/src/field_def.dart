@@ -1,5 +1,8 @@
 import 'package:analyzer/dart/ast/ast.dart';
 
+import 'converters/return_type.dart';
+
+/// This class describe field definition
 class FieldDef {
   /// Field name
   late final String name;
@@ -13,7 +16,9 @@ class FieldDef {
   FieldDef(final FieldDeclaration declaration) {
     final fields = declaration.fields;
     final nameLexeme = fields.variables.first.name.lexeme;
-    type = fields.type.toString();
+    type = ReturnTypeConverter(
+      fields.type?.toString() ?? 'dynamic',
+    ).inUml;
     isPrivate = nameLexeme.startsWith('_');
     name = nameLexeme.replaceAll(
       RegExp(r'_'),
