@@ -1,13 +1,11 @@
-import '../class_def.dart';
-import 'converter.dart';
+part of 'converter.dart';
 
-class PlantUmlConverter implements Converter {
-  static const _startText = '@startuml';
-  static const _finishText = '@enduml';
+final class PlantUmlConverter implements Converter {
+  PlantUmlConverter();
 
   @override
   String convertToText(final List<ClassDef> defs) {
-    final stringBuffer = StringBuffer('$_startText\n');
+    final stringBuffer = StringBuffer('@startuml\n');
 
     for (final def in defs) {
       stringBuffer.write(def.isAbstract ? 'abstract ' : '');
@@ -21,7 +19,7 @@ class PlantUmlConverter implements Converter {
       stringBuffer.write(convertImplements(def));
     }
 
-    stringBuffer.write(_finishText);
+    stringBuffer.write('@enduml');
     return stringBuffer.toString();
   }
 
@@ -31,17 +29,20 @@ class PlantUmlConverter implements Converter {
   @override
   String convertMethods(final ClassDef def) {
     final result = StringBuffer();
+
     for (final method in def.methods) {
       result.write(
-          '${method.isPrivate ? privateAccessModifier : publicAccessModifier}'
-          '${method.isGetter || method.isSetter ? '«' : ''}'
-          '${method.isGetter ? 'get' : ''}'
-          '${method.isGetter && method.isSetter ? '/' : ''}'
-          '${method.isSetter ? 'set' : ''}'
-          '${method.isGetter || method.isSetter ? '»' : ''}'
-          '${method.name}(): '
-          '${method.returnType}\n');
+        '${method.isPrivate ? privateAccessModifier : publicAccessModifier}'
+        '${method.isGetter || method.isSetter ? '«' : ''}'
+        '${method.isGetter ? 'get' : ''}'
+        '${method.isGetter && method.isSetter ? '/' : ''}'
+        '${method.isSetter ? 'set' : ''}'
+        '${method.isGetter || method.isSetter ? '»' : ''}'
+        '${method.name}(): '
+        '${method.returnType}\n',
+      );
     }
+
     return result.toString();
   }
 
@@ -50,7 +51,9 @@ class PlantUmlConverter implements Converter {
     final result = StringBuffer();
     for (final field in def.fields) {
       result.write(
-        '${field.isPrivate ? privateAccessModifier : publicAccessModifier}${field.name}: ${field.type}\n',
+        '${field.isPrivate ? privateAccessModifier : publicAccessModifier}'
+        '${field.name}:'
+        ' ${field.type}\n',
       );
     }
     return result.toString();

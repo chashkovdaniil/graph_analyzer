@@ -15,9 +15,9 @@ import 'reporter.dart';
 /// [reporter] - the entity that outputs the result
 class CodeUml {
   final Reporter reporter;
-  final Logger? logger;
+  final Logger logger;
 
-  CodeUml({required this.reporter, this.logger});
+  CodeUml({required this.reporter, required this.logger});
 
   /// Retrieves files from the specified directories
   List<String> _getFilePathsFromDir(final List<String> dirsPath) {
@@ -47,7 +47,7 @@ class CodeUml {
     final collection = AnalysisContextCollection(includedPaths: includedPaths);
 
     for (final path in includedPaths) {
-      logger?.regular(path);
+      logger.regular(path);
       final unit = collection.contexts.first.currentSession.getParsedUnit(path);
 
       if (unit is ParsedUnitResult) {
@@ -87,7 +87,7 @@ class CodeUml {
         classDef.deps.addAll(_analyzeDeps(member));
       }
     }
-    logger?.info('\t ${classDef.name}', onlyVerbose: true);
+    logger.info('\t ${classDef.name}', onlyVerbose: true);
     return classDef;
   }
 
@@ -163,7 +163,7 @@ class CodeUml {
         filename.endsWith('._test.dart');
 
     if (result) {
-      logger?.info('Excluded: $filename', onlyVerbose: false);
+      logger.info('Excluded: $filename', onlyVerbose: false);
     }
     return result;
   }

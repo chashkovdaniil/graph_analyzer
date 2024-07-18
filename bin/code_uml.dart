@@ -5,7 +5,7 @@ import 'package:code_uml/utils.dart';
 
 void main(final List<String> arguments) async {
   const helper = _Helper();
-
+  final logger = Logger();
   final argsParser = ArgParser();
   argsParser
     ..addFlag('verbose', abbr: 'v', help: 'More logs', hide: true)
@@ -23,23 +23,23 @@ void main(final List<String> arguments) async {
 
   final argsResults = argsParser.parse(arguments);
   if (argsResults.wasParsed('verbose')) {
-    Logger().activateVerbose();
+    logger.activateVerbose();
   }
   if (argsResults.wasParsed('help')) {
-    Logger().regular(helper.helpText(), onlyVerbose: false);
+    logger.regular(helper.helpText(), onlyVerbose: false);
     return;
   }
   final from = argsResults['from'] as String;
   final reportTo = argsResults['to'] as String;
 
   if (!argsResults.wasParsed('from')) {
-    Logger().error('Argument from is empty');
+    logger.error('Argument from is empty');
     return;
   }
 
   final converter = Converter(argsResults['uml'] as String);
   final reporter = Reporter.file(reportTo, converter);
-  final analyzer = CodeUml(reporter: reporter, logger: Logger());
+  final analyzer = CodeUml(reporter: reporter, logger: logger);
 
   analyzer.analyze(from.split(','));
 }

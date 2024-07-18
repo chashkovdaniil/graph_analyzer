@@ -1,7 +1,10 @@
 import '../../code_uml.dart';
 
+part 'mermaid_uml_converter.dart';
+part 'plant_uml_converter.dart';
+
 /// This class converts definitions to uml code
-abstract class Converter {
+sealed class Converter {
   factory Converter(final String converterType) {
     switch (converterType) {
       case 'mermaid':
