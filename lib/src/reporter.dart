@@ -8,13 +8,6 @@ import 'converters/converter.dart';
 
 ///
 abstract class Reporter {
-  static Reporter create(
-    final Converter converter, {
-    required final String reportDirPath,
-  }) {
-    return Reporter.file(reportDirPath, converter);
-  }
-
   factory Reporter.file(
     final String reportDirPath,
     final Converter converter,

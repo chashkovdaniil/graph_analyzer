@@ -54,7 +54,7 @@ class MermaidUmlConverter {
 +«get»fileExtension(): String
 +«get»methodsDivider(): String
 }
-Converter <|-- MermaidUmlConverter
+MermaidUmlConverter ..|> Converter
 class ReturnTypeConverter {
 -returnType: String
 ---
@@ -81,7 +81,6 @@ class PlantUmlConverter {
 PlantUmlConverter ..|> Converter
 abstract class Converter {
 ---
-+create(): Converter
 +«get»publicAccessModifier(): String
 +«get»privateAccessModifier(): String
 +«get»fileExtension(): String

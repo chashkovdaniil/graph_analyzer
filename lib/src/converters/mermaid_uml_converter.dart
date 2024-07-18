@@ -1,6 +1,6 @@
 import '../../code_uml.dart';
 
-class MermaidUmlConverter extends Converter {
+class MermaidUmlConverter implements Converter {
   MermaidUmlConverter();
 
   @override

@@ -2,7 +2,7 @@ import '../../code_uml.dart';
 
 /// This class converts definitions to uml code
 abstract class Converter {
-  static Converter create(final String converterType) {
+  factory Converter(final String converterType) {
     switch (converterType) {
       case 'mermaid':
         return MermaidUmlConverter();

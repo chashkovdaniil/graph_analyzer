@@ -37,8 +37,8 @@ void main(final List<String> arguments) async {
     return;
   }
 
-  final converter = Converter.create(argsResults['uml'] as String);
-  final reporter = Reporter.create(converter, reportDirPath: reportTo);
+  final converter = Converter(argsResults['uml'] as String);
+  final reporter = Reporter.file(reportTo, converter);
   final analyzer = CodeUml(reporter: reporter, logger: Logger());
 
   analyzer.analyze(from.split(','));
