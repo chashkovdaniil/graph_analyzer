@@ -1,64 +1,79 @@
-import 'dart:async';
-import 'dart:io';
-
+import 'package:args/args.dart';
 import 'package:code_uml/code_uml.dart';
+import 'package:code_uml/src/converters/mermaid_uml_converter.dart';
 import 'package:code_uml/src/reporter.dart';
 import 'package:code_uml/utils.dart';
-import 'package:code_uml/jni/jni.dart';
-import 'package:path/path.dart';
 
-void main(List<String> arguments) async {
+void main(final List<String> arguments) async {
   const helper = _Helper();
-  runZonedGuarded(() {
-    Jni.spawn(
-      dylibDir: join('build', 'jni_libs'),
-      classPath: ['java', 'java/dev/plantuml'],
-    );
-    final args = arguments.toList();
-    if (args.contains('--verbose')) {
-      Logger().activateVerbose();
-      args.remove('--verbose');
-    }
-    if (args.isEmpty) {
-      throw Exception('No arguments');
-    }
 
-    final Converter converter = PlantUmlConverter();
-    final reportTo = args.last;
-    final outputToConsole = reportTo == '--console';
-    final reporter = outputToConsole
-        ? Reporter.console(converter)
-        : Reporter.file(
-            reportTo,
-            converter,
-            PlantUmlDiagramCreator(),
-          );
-    final dirPaths = args.sublist(0, args.length - 1);
-    final analyzer = CodeUml(
-      reporter: reporter,
-      logger: Logger(),
-    );
-    analyzer.analyze(dirPaths);
-  }, (e, stackTrace) {
-    Logger().error('$e\n\n$stackTrace');
-    helper.printHelp();
-    exit(64);
-  });
+  final argsParser = ArgParser();
+  argsParser
+    ..addFlag('verbose', abbr: 'v', help: 'More logs', hide: true)
+    ..addOption(
+      'uml',
+      abbr: 'u',
+      help: 'Select uml coder',
+      defaultsTo: 'mermaid',
+      valueHelp: 'mermaid',
+      allowed: ['mermaid', 'plantuml'],
+    )
+    ..addOption('from', abbr: 'f', help: 'Input directory for analyze')
+    ..addFlag('help', abbr: 'h')
+    ..addOption('to', abbr: 't', help: 'Output file name', defaultsTo: './uml');
+
+  final argsResults = argsParser.parse(arguments);
+  if (argsResults.wasParsed('verbose')) {
+    Logger().activateVerbose();
+  }
+  if (argsResults.wasParsed('help')) {
+    Logger().regular(helper.helpText(), onlyVerbose: false);
+    return;
+  }
+  final from = argsResults['from'] as String;
+  final reportTo = argsResults['to'] as String;
+
+  if (!argsResults.wasParsed('from')) {
+    Logger().error('Argument from is empty');
+    return;
+  }
+
+  late Converter converter;
+
+  if (argsResults['uml'] == 'mermaid') {
+    converter = MermaidUmlConverter();
+  } else if (argsResults['uml'] == 'plantuml') {
+    converter = PlantUmlConverter();
+  }
+
+  // TODO: add support for console output (argsResults['to'])
+  final outputToConsole = reportTo == '--console';
+  final reporter = outputToConsole
+      ? Reporter.console(converter)
+      : Reporter.file(
+          reportTo,
+          converter,
+          PlantUmlDiagramCreator(),
+        );
+  final analyzer = CodeUml(
+    reporter: reporter,
+    logger: Logger(),
+  );
+
+  analyzer.analyze(from.split(','));
 }
 
 class _Helper {
   const _Helper();
 
-  void printHelp() {
-    print(
-      'This package will help you create code for UML, and then use it to build a diagram.\n\n'
-      '📘HELP\n'
-      'Usage:\n'
-      'Output to console: code_uml <...directory_for_analysis> [--console]\n'
-      'Output to file: code_uml <...directory_for_analysis> <output_result_file>\n'
-      '\n'
-      'Global options: \n'
-      '--console \t-\toutput to console',
-    );
+  String helpText() {
+    return '''This package will help you create code for UML, and then use it to build a diagram.
+📘Usage:
+Output to console: code_uml <...directory_for_analysis> [--console]
+Output to file: code_uml <...directory_for_analysis> <output_result_file>\n
+Global options: 
+--to=console \t-\toutput to console
+--uml=plantuml \t-\tselect uml tool. One of [mermaid, plantuml]
+--verbose \t-\tmore logs''';
   }
 }

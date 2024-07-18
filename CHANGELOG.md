@@ -1,3 +1,8 @@
+## 1.0.2
+
+* Remove JNI
+* Add support mermaid
+
 ## 1.0.1
 
 * Require Dart SDK >=2.17.0

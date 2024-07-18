@@ -1,43 +1,20 @@
 import 'dart:io';
 
-import 'package:code_uml/jni/jni.dart';
 import 'package:path/path.dart' as path;
 
-import '../../code_uml_java.dart';
-import '../../utils.dart';
 import '../class_def.dart';
 import 'converter.dart';
 
 class PlantUmlDiagramCreator implements DiagramCreator {
   @override
-  Future<bool> createFromText(String text, String resultFilePath) async {
-    final outputDiagramFile = resultFilePath.replaceAll(
-      RegExp(r'\..*$'),
-      '.svg',
-    );
-    Logger().info(
-      'Creating diagram to $outputDiagramFile...',
-      onlyVerbose: true,
-    );
-
-    final string = CodeUmlJava.getSvg(JString.fromString(text));
-    final svg = string.castTo(JString.type).toDartString();
-    final file = File(outputDiagramFile);
-    final ioSink = file.openWrite();
-    ioSink.write(svg);
-    // final processResult = await Process.run(
-    //   "bash",
-    //   ["-c", "java -jar /$binPath/plantuml.jar $resultFilePath -svg"],
+  Future<bool> createFromText(
+      final String text, final String resultFilePath) async {
+    // Logger().info('PlantUml file path is $outputDiagramFile');
+    //
+    // Logger().success(
+    //   'Created diagram: $outputDiagramFile',
+    //   onlyVerbose: false,
     // );
-    // print(processResult.stdout);
-    // if ((processResult.stderr as String).isNotEmpty) {
-    //   throw Exception(processResult.stderr);
-    // }
-    // if ((processResult.stdout as String).isEmpty) {}
-    Logger().success(
-      'Created diagram: $outputDiagramFile',
-    );
-    ioSink.close();
     return true;
   }
 
@@ -51,43 +28,85 @@ class PlantUmlConverter implements Converter {
   static const _finishText = '@enduml';
 
   @override
-  String convertToText(List<ClassDef> defs) {
-    var result = '$_startText\n';
+  String convertToText(final List<ClassDef> defs) {
+    final stringBuffer = StringBuffer('$_startText\n');
 
     for (final def in defs) {
-      result += def.isAbstract ? 'abstract ' : '';
-
-      result += 'class ${def.name} {\n';
-
-      for (var field in def.fields) {
-        result += '${field.isPrivate ? '-' : ''}${field.name}: ${field.type}\n';
-      }
-
-      result += '---\n';
-
-      for (var method in def.methods) {
-        result +=
-            '${method.isPrivate ? '-' : ''}${method.name}(): ${method.returnType}\n';
-      }
-
-      result += '}\n';
-
-      if (def.extendsOf != null) {
-        result += '${def.extendsOf} <|-- ${def.name}\n';
-      }
-      if (def.deps.isNotEmpty) {
-        for (var dep in def.deps) {
-          result += '${def.name} ..> $dep\n';
-        }
-      }
-      if (def.implementsOf.isNotEmpty) {
-        for (var implementOf in def.implementsOf) {
-          result += '${def.name} ..|> $implementOf\n';
-        }
-      }
+      stringBuffer.write(def.isAbstract ? 'abstract ' : '');
+      stringBuffer.write(convertStartClass(def));
+      stringBuffer.write(methodsDivider);
+      stringBuffer.write(convertFields(def));
+      stringBuffer.write(convertMethods(def));
+      stringBuffer.write(convertEndClass(def));
+      stringBuffer.write(convertExtends(def));
+      stringBuffer.write(convertDependencies(def));
+      stringBuffer.write(convertImplements(def));
     }
 
-    result += _finishText;
-    return result;
+    stringBuffer.write(_finishText);
+    return stringBuffer.toString();
   }
+
+  @override
+  String get fileExtension => 'puml';
+
+  @override
+  String convertMethods(final ClassDef def) {
+    final result = StringBuffer();
+    for (final method in def.methods) {
+      result.write(
+        '${method.isPrivate ? privateAccessModifier : ''}${method.name}(): ${method.returnType}\n',
+      );
+    }
+    return result.toString();
+  }
+
+  @override
+  String convertFields(final ClassDef def) {
+    final result = StringBuffer();
+    for (final field in def.fields) {
+      result.write(
+        '${field.isPrivate ? privateAccessModifier : ''}${field.name}: ${field.type}\n',
+      );
+    }
+    return result.toString();
+  }
+
+  @override
+  String convertStartClass(final ClassDef def) => 'class ${def.name} {\n';
+
+  @override
+  String convertEndClass(final ClassDef def) => '}\n';
+
+  @override
+  String get methodsDivider => '---\n';
+
+  @override
+  String convertExtends(final ClassDef classDef) {
+    if (classDef.extendsOf != null) {
+      return '${classDef.extendsOf} <|-- ${classDef.name}\n';
+    }
+    return '';
+  }
+
+  @override
+  String convertDependencies(final ClassDef def) {
+    final result = StringBuffer();
+    for (final dep in def.deps) {
+      result.write('${def.name} ..> $dep\n');
+    }
+    return result.toString();
+  }
+
+  @override
+  String convertImplements(final ClassDef def) {
+    final result = StringBuffer();
+    for (final implementOf in def.implementsOf) {
+      result.write('${def.name} ..|> $implementOf\n');
+    }
+    return result.toString();
+  }
+
+  @override
+  String get privateAccessModifier => '-';
 }
