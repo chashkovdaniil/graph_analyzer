@@ -35,12 +35,5 @@ Then you need to run the command to output the code to the console:
 > code_uml --from=[<your_path_to_dir_input>] --to=[<your_path_to_dir_output>]
 ```
 
-### Console output
-Then you need to run the command to output the code to the console:
-```bash
-> code_uml --from=[<your_path_to_dir_input>] --to=console
-```
-
-
 ## Example
 ![UML diagram](https://github.com/chashkovdaniil/graph_analyzer/raw/main/example/example.png)
