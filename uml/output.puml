@@ -1,0 +1,37 @@
+@startuml
+class MockManRepository {
+---
+}
+Mock <|-- MockManRepository
+MockManRepository ..|> ManRepository
+class Man {
+---
+}
+abstract class ManRepository {
+---
+getMan(): Man
+addMan(): void
+saveMan(): void
+removeMan(): void
+getMen(): Man[0..*]
+}
+class ManInteractor {
+---
+-repository: ManRepository
+-validator: ManValidator
+getMen(): Man[0..*]
+getMan(): Man
+addMan(): void
+saveMan(): void
+removeMan(): void
+}
+ManInteractor ..> ManRepository
+ManInteractor ..> ManValidator
+class ManValidator {
+---
+checkId(): void
+checkMan(): void
+checkPageNumber(): void
+checkPageElementsCount(): void
+}
+@enduml

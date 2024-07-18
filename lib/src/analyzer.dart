@@ -6,7 +6,6 @@ import 'package:analyzer/dart/ast/ast.dart';
 
 import '../utils.dart';
 import 'class_def.dart';
-import 'components_installer.dart';
 import 'field_def.dart';
 import 'method_def.dart';
 import 'reporter.dart';
@@ -17,17 +16,16 @@ import 'reporter.dart';
 class CodeUml {
   final Reporter reporter;
   final Logger? logger;
-  final ComponentsInstaller _componentsInstaller = ComponentsInstaller();
 
   CodeUml({required this.reporter, this.logger});
 
   /// Retrieves files from the specified directories
-  List<String> _getFilePathsFromDir(List<String> dirsPath) {
+  List<String> _getFilePathsFromDir(final List<String> dirsPath) {
     final files = <String>[];
     for (final dirPath in dirsPath) {
       final dir = Directory(dirPath);
 
-      dir.listSync(recursive: true).forEach((fileEntity) {
+      dir.listSync(recursive: true).forEach((final fileEntity) {
         if (fileEntity.statSync().type != FileSystemEntityType.file ||
             !fileEntity.path.endsWith('.dart')) {
           return;
@@ -39,9 +37,7 @@ class CodeUml {
     return files;
   }
 
-  Future<void> analyze(List<String> dirsPath) async {
-    await _componentsInstaller.checkComponents();
-
+  Future<void> analyze(final List<String> dirsPath) async {
     if (dirsPath.isEmpty) {
       throw Exception('Directories are not specified');
     }
@@ -54,6 +50,10 @@ class CodeUml {
       final unit = collection.contexts.first.currentSession.getParsedUnit(path);
 
       if (unit is ParsedUnitResult) {
+        if (_isExcludedFile(unit.uri)) {
+          continue;
+        }
+
         for (final unitMember in unit.unit.declarations) {
           if (unitMember is ClassDeclaration) {
             final analyzedClass = _analyzeClass(unitMember);
@@ -67,10 +67,10 @@ class CodeUml {
   }
 
   /// Analyzes a class for methods, fields, inheritance, implementations, and dependencies
-  ClassDef _analyzeClass(ClassDeclaration classDeclaration) {
-    final extendsOf = classDeclaration.extendsClause?.superclass.name.name;
+  ClassDef _analyzeClass(final ClassDeclaration classDeclaration) {
+    final extendsOf = classDeclaration.extendsClause?.superclass.name2.lexeme;
     final implementsOf = classDeclaration.implementsClause?.interfaces
-            .map((e) => e.name.name)
+            .map((final e) => e.name2.lexeme)
             .toList() ??
         [];
     final classDef = ClassDef();
@@ -91,25 +91,19 @@ class CodeUml {
   }
 
   /// Analyzes a method
-  MethodDef _analyzeMethod(MethodDeclaration methodDeclaration) {
-    final methodDef = MethodDef();
-    methodDef.returnType = methodDeclaration.returnType?.toString() ?? 'void';
-    methodDef.name = methodDeclaration.name.lexeme;
-    methodDef.isPrivate = methodDef.name.startsWith('_');
+  MethodDef _analyzeMethod(final MethodDeclaration methodDeclaration) {
+    final methodDef = MethodDef(methodDeclaration);
     return methodDef;
   }
 
   /// Analyzes a class field
-  FieldDef _analyzeField(FieldDeclaration fieldDeclaration) {
-    final fieldDef = FieldDef();
-    fieldDef.type = fieldDeclaration.fields.type.toString();
-    fieldDef.name = fieldDeclaration.fields.variables.first.name.lexeme;
-    fieldDef.isPrivate = fieldDef.name.startsWith('_');
+  FieldDef _analyzeField(final FieldDeclaration fieldDeclaration) {
+    final fieldDef = FieldDef(fieldDeclaration);
     return fieldDef;
   }
 
   /// Analyzes dependencies
-  Set<String> _analyzeDeps(FieldDeclaration fieldDeclaration) {
+  Set<String> _analyzeDeps(final FieldDeclaration fieldDeclaration) {
     final result = <String>{};
     var type = fieldDeclaration.fields.type.toString();
 
@@ -129,10 +123,12 @@ class CodeUml {
   }
 
   /// Determines whether the data type is a dependency. It is a dependency if it is not a base type
-  bool _isDep(String type) =>
+  bool _isDep(final String type) =>
       !type.startsWith('List') &&
       !type.startsWith('Map') &&
       !type.startsWith('Set') &&
+      !type.startsWith(r'_$') &&
+      !type.startsWith(r'__$') &&
       ![
         'String',
         'int',
@@ -158,4 +154,16 @@ class CodeUml {
         'Completer?',
       ].contains(type) &&
       !type.contains(' ');
+
+  bool _isExcludedFile(final Uri uri) {
+    final filename = uri.pathSegments.last;
+    final result = filename.endsWith('.g.dart') ||
+        filename.endsWith('.freezed.dart') ||
+        filename.endsWith('._test.dart');
+
+    if (result) {
+      Logger().info('Excluded: $filename', onlyVerbose: false);
+    }
+    return result;
+  }
 }
