@@ -1,5 +1,6 @@
 import 'package:analyzer/dart/ast/ast.dart';
 
+/// This class describe field definition
 import 'converters/return_type.dart';
 
 /// This class describe field definition
