@@ -27,6 +27,12 @@ The first step is to perform the installation:
 ```bash
 > code_uml --from=[<your_path_to_dir_input>] --to=[<your_path_to_dir_output>] --uml=mermaid
 ```
+Make to write <your_path_to_dir_input> and <your_path_to_dir_output> with the absolute paths of your input and output directories. On macOS and Linux, you can obtain the absolute path using pwd, and on Windows, you can use cd.
+
+For example, if your project absolute path is /Users/tester/Desktop/your_project_name, the command would be:
+```bash
+> code_uml --from="/Users/tester/Desktop/your_project_name/lib" --to="/Users/tester/Desktop/your_project_name" --uml=plantuml
+```
 
 ## Output
 ### File output
