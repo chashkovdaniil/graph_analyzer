@@ -1,14 +1,20 @@
 part of 'converter.dart';
 
 final class PlantUmlConverter implements Converter {
-  PlantUmlConverter();
+  @override
+  final String? theme;
+
+  PlantUmlConverter({this.theme});
 
   @override
   String convertToText(final List<ClassDef> defs) {
     final stringBuffer = StringBuffer('@startuml\n');
+    if (theme != null) {
+      stringBuffer.write('!theme $theme\n');
+    }
 
     for (final def in defs) {
-      stringBuffer.write(def.isAbstract ? 'abstract ' : '');
+      stringBuffer.write(def.isAbstract && !def.isInterface ? 'abstract ' : '');
       stringBuffer.write(convertStartClass(def));
       stringBuffer.write(convertFields(def));
       stringBuffer.write(methodsDivider);
@@ -60,7 +66,8 @@ final class PlantUmlConverter implements Converter {
   }
 
   @override
-  String convertStartClass(final ClassDef def) => 'class ${def.name} {\n';
+  String convertStartClass(final ClassDef def) =>
+      '${def.isInterface ? "interface" : "class"} ${def.name} {\n';
 
   @override
   String convertEndClass(final ClassDef def) => '}\n';

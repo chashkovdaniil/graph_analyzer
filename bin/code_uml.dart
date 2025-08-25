@@ -4,57 +4,72 @@ import 'package:code_uml/src/reporter.dart';
 import 'package:code_uml/utils.dart';
 
 void main(final List<String> arguments) async {
-  const helper = _Helper();
   final logger = Logger();
   final argsParser = ArgParser();
   argsParser
-    ..addFlag('verbose', abbr: 'v', help: 'More logs', hide: true)
+    ..addFlag('help', abbr: 'h', help: 'Show this help', negatable: false)
     ..addOption(
       'uml',
       abbr: 'u',
-      help: 'Select uml coder',
+      help: 'UML variant',
       defaultsTo: 'plantuml',
-      valueHelp: 'plantuml',
-      allowed: ['mermaid', 'plantuml'],
+      valueHelp: 'uml_variant',
+      allowed: ['plantuml', 'mermaid'],
+      allowedHelp: {
+        'plantuml': 'PlantUML',
+        'mermaid': 'Mermaid uml',
+      },
     )
-    ..addOption('from', abbr: 'f', help: 'Input directory for analyze')
-    ..addFlag('help', abbr: 'h')
-    ..addOption('to', abbr: 't', help: 'Output file name', defaultsTo: './uml');
-
-  final argsResults = argsParser.parse(arguments);
+    ..addOption(
+      'theme',
+      abbr: 't',
+      help: 'Theme for the UML diagram (must match the selected UML variant)',
+      defaultsTo: null,
+      valueHelp: 'theme_name',
+    )
+    ..addMultiOption('input',
+        abbr: 'i',
+        help: 'Input directories for analysis, '
+            'specify multiple with additional -i options',
+        valueHelp: 'analysis_dirs',
+        defaultsTo: ['./lib'])
+    ..addOption('output',
+        abbr: 'o',
+        help: 'Output directory to save the generate UML file',
+        valueHelp: 'output_dir',
+        defaultsTo: './uml')
+    ..addMultiOption('exclude-files',
+        abbr: 'e',
+        help: 'Files to exclude from analysis, this will try to match the'
+            ' end of the file(s) found in the input directories, '
+            'specify multiple with additional -e options',
+        valueHelp: 'exclude_files',
+        defaultsTo: [])
+    ..addFlag('verbose', abbr: 'v', help: 'Verbose output', negatable: false);
+  final ArgResults argsResults;
+  try {
+    argsResults = argsParser.parse(arguments);
+  } catch (e) {
+    logger.error('Error parsing arguments: $e', onlyVerbose: false);
+    logger.info('Usage:\n', onlyVerbose: false);
+    logger.regular(argsParser.usage, onlyVerbose: false);
+    return;
+  }
   if (argsResults.wasParsed('verbose')) {
     logger.activateVerbose();
   }
   if (argsResults.wasParsed('help')) {
-    logger.regular(helper.helpText(), onlyVerbose: false);
+    logger.regular('Usage:\n', onlyVerbose: false);
+    logger.regular(argsParser.usage, onlyVerbose: false);
     return;
   }
-  final from = argsResults['from'] as String;
-  final reportTo = argsResults['to'] as String;
-
-  if (!argsResults.wasParsed('from')) {
-    logger.error('Argument from is empty');
-    return;
-  }
-
-  final converter = Converter(argsResults['uml'] as String);
+  final input = argsResults['input'] as Iterable<String>;
+  final reportTo = argsResults['output'] as String;
+  final converter = Converter(argsResults['uml'] as String,
+      theme: argsResults['theme'] as String?);
   final reporter = Reporter.file(reportTo, converter);
   final analyzer = CodeUml(reporter: reporter, logger: logger);
 
-  analyzer.analyze(from.split(','));
-}
-
-class _Helper {
-  const _Helper();
-
-  String helpText() {
-    return '''This package will help you create code for UML, and then use it to build a diagram.
-📘Usage:
-Output to console: code_uml <...directory_for_analysis> [--console]
-Output to file: code_uml <...directory_for_analysis> <output_result_file>\n
-Global options: 
---to=console \t-\toutput to console
---uml=plantuml \t-\tselect uml tool. One of [mermaid, plantuml]
---verbose \t-\tmore logs''';
-  }
+  analyzer.analyze(input.toList(growable: false),
+      excludeFiles: argsResults['exclude-files'] as List<String>);
 }

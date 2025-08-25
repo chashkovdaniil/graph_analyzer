@@ -1,11 +1,18 @@
 part of 'converter.dart';
 
 final class MermaidUmlConverter implements Converter {
-  MermaidUmlConverter();
+  @override
+  final String? theme;
+
+  MermaidUmlConverter({this.theme});
 
   @override
   String convertToText(final List<ClassDef> defs) {
     final stringBuffer = StringBuffer();
+    if (theme != null) {
+      // Add YAML front matter for Mermaid theme
+      stringBuffer.write('---\nconfig:\n  theme: $theme\n---\n');
+    }
     stringBuffer.write('classDiagram\n');
 
     for (final def in defs) {

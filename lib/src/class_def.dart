@@ -23,4 +23,6 @@ class ClassDef {
   String name = '';
   String? extendsOf;
   bool isAbstract = false;
+  bool isInterface = false;
+  bool isMixin = false;
 }

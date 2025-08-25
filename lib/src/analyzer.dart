@@ -23,7 +23,7 @@ class CodeUml {
   List<String> _getFilePathsFromDir(final List<String> dirsPath) {
     final files = <String>[];
     for (final dirPath in dirsPath) {
-      final dir = Directory(dirPath);
+      final dir = Directory(dirPath).absolute;
 
       dir.listSync(recursive: true).forEach((final fileEntity) {
         if (fileEntity.statSync().type != FileSystemEntityType.file ||
@@ -31,18 +31,34 @@ class CodeUml {
           return;
         }
 
-        final path = fileEntity.path;
+        final path = fileEntity.absolute.resolveSymbolicLinksSync();
+
         files.add(path);
       });
     }
     return files;
   }
 
-  Future<void> analyze(final List<String> dirsPath) async {
+  Future<void> analyze(final List<String> dirsPath,
+      {final List<String> excludeFiles = const []}) async {
     if (dirsPath.isEmpty) {
       throw Exception('Directories are not specified');
     }
     final includedPaths = _getFilePathsFromDir(dirsPath).toList();
+    // Exclude specified files
+    if (excludeFiles.isNotEmpty) {
+      final matchedExculdes = includedPaths.where((final path) {
+        return excludeFiles.any((final exclude) => path.endsWith(exclude));
+      }).toList();
+      if (matchedExculdes.isNotEmpty) {
+        logger.info('Excluding files:', onlyVerbose: false);
+        for (final exclude in matchedExculdes) {
+          logger.info('\t$exclude', onlyVerbose: false);
+          includedPaths.remove(exclude);
+        }
+      }
+    }
+
     final classesDef = <ClassDef>[];
     final collection = AnalysisContextCollection(includedPaths: includedPaths);
 
@@ -69,9 +85,9 @@ class CodeUml {
 
   /// Analyzes a class for methods, fields, inheritance, implementations, and dependencies
   ClassDef _analyzeClass(final ClassDeclaration classDeclaration) {
-    final extendsOf = classDeclaration.extendsClause?.superclass.name2.lexeme;
+    final extendsOf = classDeclaration.extendsClause?.superclass.name.lexeme;
     final implementsOf = classDeclaration.implementsClause?.interfaces
-            .map((final e) => e.name2.lexeme)
+            .map((final e) => e.name.lexeme)
             .toList() ??
         [];
     final classDef = ClassDef();
@@ -79,6 +95,9 @@ class CodeUml {
     classDef.extendsOf = extendsOf;
     classDef.isAbstract = classDeclaration.abstractKeyword != null;
     classDef.implementsOf.addAll(implementsOf);
+    classDef.isInterface = classDeclaration.interfaceKeyword != null;
+    classDef.isMixin = classDeclaration.mixinKeyword != null;
+
     for (final member in classDeclaration.members) {
       if (member is MethodDeclaration) {
         classDef.methods.add(_analyzeMethod(member));
